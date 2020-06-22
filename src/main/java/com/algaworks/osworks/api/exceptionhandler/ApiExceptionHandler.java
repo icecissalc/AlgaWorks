@@ -1,6 +1,7 @@
 package com.algaworks.osworks.api.exceptionhandler;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.algaworks.osworks.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.osworks.domain.exception.NegocioException;
 
 @ControllerAdvice
@@ -26,6 +28,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 	 * criar o arquivo messages.properties no diretório src/main/resources
 	 * 
 	 * NotBlank=é obrigatório
+	 * NotNull=é obrigatório
 	 * Size=deve ter no mínimo {2} e no máximo {1} caracteres
 	 * Email=deve ser um e-mail válido
 	 * 
@@ -58,10 +61,23 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		Problema problema = new Problema();
 		problema.setStatus(status.value());
 		problema.setTitulo("Um ou mais campos estão inválidos. Reveja o preenchimento e tente novamente.");
-		problema.setDataHora(LocalDateTime.now());
+		problema.setDataHora(OffsetDateTime.now());
 		problema.setCampos(campos);
 		
 		return handleExceptionInternal(ex, problema, headers, status, request);
+	}
+	
+	@ExceptionHandler(EntidadeNaoEncontradaException.class)
+	public ResponseEntity<Object> EntidadeNaoEncontradaException(NegocioException ex, WebRequest request) {
+		
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		
+		Problema problema = new Problema();
+		problema.setStatus(status.value());
+		problema.setTitulo(ex.getMessage());
+		problema.setDataHora(OffsetDateTime.now());
+		
+		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
 	}
 	
 	@ExceptionHandler(NegocioException.class)
@@ -72,7 +88,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		Problema problema = new Problema();
 		problema.setStatus(status.value());
 		problema.setTitulo(ex.getMessage());
-		problema.setDataHora(LocalDateTime.now());
+		problema.setDataHora(OffsetDateTime.now());
 		
 		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
 	}

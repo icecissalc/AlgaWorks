@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 @Entity
 public class Cliente {
 	
+//	Validações retiradas do Model da Entidade pois já são realizadas pelo model em api.model
+//	@NotNull(groups = ValidationGroups.ClienteId.class)
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
